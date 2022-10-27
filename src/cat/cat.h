@@ -14,8 +14,4 @@
     //  -t      Display non-printing characters (see the -v option), and display
     //          tab characters as `^I'
 
-void cat_non_blank(char** text);
-void cat_endl(char** text);
-void cat_num(char** text);
-void cat_squeeze(char** text);
-void cat_tab(char** text);
+void cat(char* filename, int flags[5]);
