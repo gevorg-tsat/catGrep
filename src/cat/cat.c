@@ -42,9 +42,14 @@ void cat(char* filename, int flags[5]) {
 
         c = fgetc(file);
     }
-} 
+}
+
+void parse(int argc, char** args, int flags[5]) {
+     
+}
+
 int main() {
-    int flags[] = {0,1,0,0,1};
+    int flags[] = {0,0,0,0,0};
     cat("/Users/knothulk/test.txt", flags);
     return 0;
 }

@@ -15,3 +15,4 @@
     //          tab characters as `^I'
 
 void cat(char* filename, int flags[5]);
+void parse(int argc, char** args, int flags[5]);
