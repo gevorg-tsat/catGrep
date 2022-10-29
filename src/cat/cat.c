@@ -2,7 +2,7 @@
 
 void cat(char* filename, int flags[5]) {
     FILE *file = fopen(filename, "r");
-    char c = 0;
+    int c = 0;
     //flags:
     // [0] -b: non empty
     // [1] -e: $ instead of \n
@@ -22,9 +22,16 @@ void cat(char* filename, int flags[5]) {
             printf("     %d  ", ++lines_counter);
         else if (flags[0] && empty_test && c!='\n')
             printf("     %d  ", ++lines_counter);
-        
-        if (!(flags[3] && empty_flag && c == '\n'))
-            printf("%c", c);
+        if ((flags[1] || flags[4]) && (c >=0 && c <=31) && c!=10 && c!=9)
+            printf("^%c", c + 64);
+        else if ((flags[1] || flags[4]) && (c>=128))
+            printf("%c", c - 64);
+        else if (flags[1] && c == '\n')
+            printf("$%c", c);
+        else if (flags[4] && c == 9)
+            printf("^I");
+        else if (!(flags[3] && empty_flag && c == '\n'))
+            printf("M-%c", c);
         if (c == '\n' && !empty_test) {
             empty_test = 1;
         } else if (c == '\n' && empty_test) {
@@ -32,13 +39,12 @@ void cat(char* filename, int flags[5]) {
         } else
             empty_test = 0, empty_flag = 0;
         
-        
-        
+
         c = fgetc(file);
     }
 } 
 int main() {
-    int flags[] = {0,0,0,1,0};
+    int flags[] = {0,1,0,0,1};
     cat("/Users/knothulk/test.txt", flags);
     return 0;
 }
