@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <getopt.h>
 
     //  -b      Number the non-blank output lines, starting at 1.
 
@@ -15,4 +16,4 @@
     //          tab characters as `^I'
 
 void cat(char* filename, int flags[5]);
-void parse(int argc, char** args, int flags[5]);
+void parse(int argc, char** argv, int flags[5]);

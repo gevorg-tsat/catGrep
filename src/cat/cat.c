@@ -44,8 +44,49 @@ void cat(char* filename, int flags[5]) {
     }
 }
 
-void parse(int argc, char** args, int flags[5]) {
-     
+void parse(int argc, char** argv, int flags[5], int* file_id) {
+    //flags:
+    // [0] -b: non empty
+    // [1] -e: $ instead of \n
+    // [2] -n: all lines
+    // [3] -s squeeze empty lines
+    // [4] -t ^I instead of tab 
+     	const char* short_options = "beEnstTv";
+    const struct option long_options[] = {
+        {"number-nonblank", no_argument, NULL, 'b'},
+        {"number", optional_argument, NULL, 'n'},
+        {"squeeze-blank", required_argument, NULL, 's'},
+        {NULL, 0, NULL, 0}
+    };
+    int rez, option_index;
+    opterr = 0;
+    while ((rez = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1 && !flag) {
+        if (rez == 'b') { 
+            flags[0] = 1;
+            flags[2] = 0;
+        } else if (rez == 'e') {
+            flags[1] = 1;
+            op->v = 1;
+        } else if (rez == 'E') {
+            op->e = 1;
+        } else if (rez == 'T') {
+            op->t = 1;
+        } else if (rez == 'n') {
+            if (op->b == 0)
+                op->n = 1;
+        } else if (rez == 's') {
+            op->s = 1;
+        } else if (rez == 't') {
+            op->t = 1;
+            op->v = 1;
+        } else if (rez == 'v') {
+            op->v = 1;
+        } else {
+            fprintf(stderr, "Wrong param");
+            flag = 1;
+        }
+    };
+    *file_id = optind;
 }
 
 int main() {
