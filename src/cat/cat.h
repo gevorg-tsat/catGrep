@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
     //  -b      Number the non-blank output lines, starting at 1.
 
