@@ -2,6 +2,10 @@
 
 void cat(char* filename, int flags[6]) {
     FILE *file = fopen(filename, "r");
+    if (!file) {
+        printf("No such file or directory");
+        return;
+    }
     int c = 0;
     //flags:
     // [0] -b: non empty
@@ -40,8 +44,6 @@ void cat(char* filename, int flags[6]) {
             empty_flag = 1;
         } else
             empty_test = 0, empty_flag = 0;
-        
-
         c = fgetc(file);
     }
 }
