@@ -18,7 +18,9 @@ void cat(char* filename, int flags[6]) {
     while (c != EOF) {
         if (c == EOF)
             return;
-        if (flags[2] && empty_test)
+        if (flags[3] && empty_flag && c == '\n')
+            {;}
+        else if (flags[2] && empty_test)
             printf("     %d  ", ++lines_counter);
         else if (flags[0] && empty_test && c!='\n')
             printf("     %d  ", ++lines_counter);
@@ -31,7 +33,7 @@ void cat(char* filename, int flags[6]) {
         else if (flags[4] && c == 9)
             printf("^I");
         else if (!(flags[3] && empty_flag && c == '\n'))
-            printf("M-%c", c);
+            printf("%c", c);
         if (c == '\n' && !empty_test) {
             empty_test = 1;
         } else if (c == '\n' && empty_test) {
@@ -44,7 +46,7 @@ void cat(char* filename, int flags[6]) {
     }
 }
 
-void parse(int argc, char** argv, int flags[5], int* file_id) {
+void parse(int argc, char** argv, int flags[6], int* file_id) {
     //flags:
     // [0] -b: non empty
     // [1] -E: $ instead of \n
@@ -101,8 +103,10 @@ void parse(int argc, char** argv, int flags[5], int* file_id) {
     *file_id = optind;
 }
 
-int main() {
-    int flags[] = {0,0,0,0,0};
-    cat("/Users/knothulk/test.txt", flags);
+int main(int argc, char* argv[]) {
+    int flags[] = {0,0,0,0,0,0};
+    int file_id = 0;
+    parse(argc, argv,flags, &file_id);
+    cat(argv[file_id], flags);
     return 0;
 }

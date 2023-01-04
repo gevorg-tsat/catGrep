@@ -12,6 +12,7 @@
     //  -s      Squeeze multiple adjacent empty lines, causing the output to be
     //          single spaced.
 
+
     //  -t      Display non-printing characters (see the -v option), and display
     //          tab characters as `^I'
 
