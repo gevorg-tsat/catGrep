@@ -17,4 +17,4 @@
     //          tab characters as `^I'
 
 void cat(char* filename, int flags[6]);
-void parse(int argc, char** argv, int flags[6], int* file_id);
+int parse(int argc, char** argv, int flags[6], int* file_id);
