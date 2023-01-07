@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <regex.h>
 #include <getopt.h>
-#define LINEMAX 100
+#include <string.h>
+#define LINEMAX 101
 typedef struct node {
     int line;
     char data[LINEMAX];

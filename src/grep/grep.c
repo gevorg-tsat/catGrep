@@ -1,16 +1,38 @@
 #include "grep.h"
 
 node* init(int line, char data[LINEMAX]) {
-
+    node *head = malloc(sizeof(node));
+    strcpy(head -> data, data);
+    head -> line = line;
+    head -> next = NULL;
+    return head;
 }
 node* add(node* head, int line, char data[LINEMAX]) {
-
+    if (head == NULL)
+        return init(line, data);
+    node *temp = head;
+    while (temp -> next != NULL)
+        temp = temp -> next;
+    temp -> next = init(line, data);
+    return head;
 }
 void clear_list(node* head) {
-
+    if (head == NULL)
+        return;
+    node* temp = head -> next;
+    while (head != NULL) {
+        free(head);
+        head = temp;
+        temp = temp -> next;
+    }
 }
 int count(node* head) {
-
+    int cnt = 0;
+    while (head != NULL) {
+        cnt++;
+        head = head -> next;
+    }
+    return cnt;
 }
 
 int parse(int argc, char** argv, flags* flags, int* file_id) {
@@ -42,6 +64,7 @@ int parse(int argc, char** argv, flags* flags, int* file_id) {
                 break;
             case 'v':
                 flags -> v = 1;
+                flags -> o = 0;
                 break;
             case 'c':
                 flags -> c = 1;
@@ -62,7 +85,8 @@ int parse(int argc, char** argv, flags* flags, int* file_id) {
                 flags -> f = 1;
                 break;
             case 'o':
-                flags -> o = 1;
+                if (!(flags->v))
+                    flags -> o = 1;
                 break;
             default:
                 fprintf(stderr, "Wrong param");
@@ -83,8 +107,11 @@ void grep(char* filename, char* find, flags flags) {
         return;
     }
     node *head = NULL;
-    // process of searching
+    int line_counter = 1;
+    char line[LINEMAX];
+    
 
+    // out
     if (flags.c || flags.l) {
         if (flags.c) {
             if (!flags.h)
@@ -95,8 +122,19 @@ void grep(char* filename, char* find, flags flags) {
             printf("%s\n", filename);
     }
     else {
-        
+        node* temp = head;
+        while(temp != NULL) {
+            if (!flags.h)
+                printf("%s:", filename);
+            if(flags.n)
+                printf("%d:", temp -> line);
+            printf("%s\n", temp -> data);
+            temp = temp -> next;
+        }
     }
+    clear_list(head);
+    head = NULL;
+    fclose(file);
 } 
 /*
 -e Шаблон
