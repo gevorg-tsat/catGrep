@@ -1,6 +1,12 @@
 #include <stdio.h>
 #include <regex.h>
 #include <getopt.h>
+#define LINEMAX 100
+typedef struct node {
+    int line;
+    char data[LINEMAX];
+    struct node* next;
+} node;
 
 typedef struct flags {
     int e = 0;
@@ -15,5 +21,9 @@ typedef struct flags {
     int o = 0;
 } flags;
 
+node* init(int line, char data[LINEMAX]);
+node* add(node* head, int line, char data[LINEMAX]);
+void clear_list(node* head);
+int count(node* head);
 int parse(int argc, char** argv, flags* flags, int* file_id);
 void grep(char* filename, char* find, flags flags);

@@ -1,5 +1,18 @@
 #include "grep.h"
 
+node* init(int line, char data[LINEMAX]) {
+
+}
+node* add(node* head, int line, char data[LINEMAX]) {
+
+}
+void clear_list(node* head) {
+
+}
+int count(node* head) {
+
+}
+
 int parse(int argc, char** argv, flags* flags, int* file_id) {
         int param_count = 0;
     for (; param_count + 1 < argc && argv[param_count + 1][0] == '-'; param_count++);
@@ -57,10 +70,60 @@ int parse(int argc, char** argv, flags* flags, int* file_id) {
         }
         i++;
     }
-    *file_id = optind;
+    *file_id = optind + 1;
     return 0;
 }
 
 void grep(char* filename, char* find, flags flags) {
-    
-}
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        if (!(flags.s))
+            fprintf(stderr, "grep: %s: No such file or directory", filename);
+        fclose(file);
+        return;
+    }
+    node *head = NULL;
+    // process of searching
+
+    if (flags.c || flags.l) {
+        if (flags.c) {
+            if (!flags.h)
+                printf("%s:", filename);
+            printf("%d\n", count(head));
+        }
+        if (flags.l && count(head) > 0)
+            printf("%s\n", filename);
+    }
+    else {
+        
+    }
+} 
+/*
+-e Шаблон
+
+-i Игнорирует различия регистра.
+
+-v
+Инвертирует смысл поиска соответствий.
+-f file
+Получает регулярные выражения из файла.
+
+
+-o
+Печатает только совпадающие (непустые) части совпавшей строки.
+
+-c
+Выводит только количество совпадающих строк.
+
+-l
+Выводит только совпадающие файлы.
+
+-n
+Предваряет каждую строку вывода номером строки из файла ввода.
+
+-h
+Выводит совпадающие строки, не предваряя их именами файлов.
+
+-s
+Подавляет сообщения об ошибках о несуществующих или нечитаемых файлах.
+*/
