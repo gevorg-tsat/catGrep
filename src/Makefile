@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-c -Wall -Werror -Wextra
 LGFLAGS=
 SOURCES1=cat/cat.c
-SOURCES2=
+SOURCES2=grep/grep.c
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=
 EXECUTABLE1=cat/s21_cat
@@ -21,3 +21,6 @@ clean:
 
 build_cat:
 	make SOURCES="$(SOURCES1)" EXECUTABLE=$(EXECUTABLE1) all
+
+build_grep:
+	make SOURCES="$(SOURCES2)" EXECUTABLE=$(EXECUTABLE2) all

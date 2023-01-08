@@ -2,6 +2,7 @@
 #include <regex.h>
 #include <getopt.h>
 #include <string.h>
+#include <stdlib.h>
 #define LINEMAX 101
 typedef struct node {
     int line;
@@ -10,16 +11,16 @@ typedef struct node {
 } node;
 
 typedef struct flags {
-    int e = 0;
-    int i = 0;
-    int v = 0;
-    int c = 0;
-    int l = 0;
-    int n = 0;
-    int h = 0;
-    int s = 0;
-    int f = 0;
-    int o = 0;
+    int e;
+    int i;
+    int v;
+    int c;
+    int l;
+    int n;
+    int h;
+    int s;
+    int f;
+    int o;
 } flags;
 
 node* init(int line, char data[LINEMAX]);

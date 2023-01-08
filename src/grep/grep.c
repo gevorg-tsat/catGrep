@@ -110,9 +110,13 @@ void grep(char* filename, char* find, flags flags) {
     int line_counter = 1;
     char line[LINEMAX];
 
+    if (flags.i) {
+        char* (*str_found)(const char*, const char*) = strstr;
+    }
     while(!feof(file)) {
         fgets(line, LINEMAX, file);
-        // -i with callbacks
+        
+
     }
     // out
     if (flags.c || flags.l) {
