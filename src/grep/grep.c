@@ -109,8 +109,11 @@ void grep(char* filename, char* find, flags flags) {
     node *head = NULL;
     int line_counter = 1;
     char line[LINEMAX];
-    
 
+    while(!feof(file)) {
+        fgets(line, LINEMAX, file);
+        // -i with callbacks
+    }
     // out
     if (flags.c || flags.l) {
         if (flags.c) {
@@ -138,17 +141,11 @@ void grep(char* filename, char* find, flags flags) {
 } 
 /*
 -e Шаблон
+-i Игнорирует различия регистра. //strcasestr
+-v Инвертирует смысл поиска соответствий.
+-f file Получает регулярные выражения из файла.
+-o Печатает только совпадающие (непустые) части совпавшей строки.
 
--i Игнорирует различия регистра.
-
--v
-Инвертирует смысл поиска соответствий.
--f file
-Получает регулярные выражения из файла.
-
-
--o
-Печатает только совпадающие (непустые) части совпавшей строки.
 
 -c
 Выводит только количество совпадающих строк.
