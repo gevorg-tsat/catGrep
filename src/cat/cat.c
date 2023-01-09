@@ -4,7 +4,7 @@ void cat(char* filename, int flags[6]) {
     FILE *file = fopen(filename, "r");
     if (!file) {
         fprintf(stderr, "cat: %s: No such file or directory", filename);
-        fclose(file);
+        //fclose(file);
         return;
     }
     int c = 0;

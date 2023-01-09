@@ -1,5 +1,15 @@
 #include "grep.h"
 
+int main(int argc, char* argv[]) {
+    flags flags = {0};
+    int file_id = 0;
+    if (parse(argc, argv, &flags, &file_id))
+        return 1;
+    for (int i = file_id; i < argc; i++)
+        grep(
+    return 0;
+}
+
 node* init(int line, char data[LINEMAX]) {
     node *head = malloc(sizeof(node));
     strcpy(head -> data, data);
@@ -35,29 +45,22 @@ int count(node* head) {
     return cnt;
 }
 
-int parse(int argc, char** argv, flags* flags, int* file_id) {
-        int param_count = 0;
+int parse(int argc, char** argv, flags* flags, int* file_id, char pattern[LINEMAX], char pattern_file[LINEMAX]) {
+    int param_count = 0;
     for (; param_count + 1 < argc && argv[param_count + 1][0] == '-'; param_count++);
-    const char* short_options = "eivclnhsfo";
-    const struct option long_options[] = {
-        {"line-number", no_argument, NULL, 'n'},
-        {"file", required_argument, NULL, 'f'},
-        {"no-filename", no_argument, NULL, 'h'},
-        {NULL, 0, NULL, 0},
-        {"count", no_argument, NULL, 'c'},
-        {"ignore-case", no_argument, NULL, 'i'},
-        {"files-with-matches", no_argument, NULL, 'f'},
-        {"only-matching", no_argument, NULL, 'o'},
-        {"no-messages", no_argument, NULL, 's'},
-        {"invert-match", no_argument, NULL, 'v'},
-    };
+    const char* short_options = "e:ivclnhsf:o";
+    const struct option long_options[] = {{NULL, 0, NULL, 0}};
     int rez, option_index, i = 0;
     opterr = 0;
     optind = 1;
+    pattern[0]='\0';
+    pattern_file[0]='\0';
     while (i < param_count && (rez = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1) {
         switch (rez) {
             case 'e':
                 flags -> e = 1;
+                strcat(pattern, optarg);
+                strcat(pattern_file, "|");
                 break;
             case 'i':
                 flags -> i = 1;
@@ -83,6 +86,8 @@ int parse(int argc, char** argv, flags* flags, int* file_id) {
                 break;
             case 'f':
                 flags -> f = 1;
+                strcat(pattern_file, optarg);
+                strcat(pattern_file, "|");
                 break;
             case 'o':
                 if (!(flags->v))
@@ -94,11 +99,34 @@ int parse(int argc, char** argv, flags* flags, int* file_id) {
         }
         i++;
     }
-    *file_id = optind + 1;
+    if (!(flags -> f) && !(flags -> e)) {
+        strcat(pattern, argv[optind]);
+        optind++;
+    }
+    *file_id = optind;
     return 0;
 }
 
-void grep(char* filename, char* find, flags flags) {
+int read_pattern_file(char* filename, char pattern[LINEMAX * _LINE_AMOUNT_MAX_]) {
+    pattern[0] = '\0';
+    char line[LINEMAX];
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        //if (!(flags.s))
+            //fprintf(stderr, "grep: %s: No such file or directory", filename);
+        return 1;
+    }
+    while(!feof(file)) {
+        fgets(line, LINEMAX, file);
+        strcat(pattern, line);
+        strcat(pattern, "|");
+    }
+    fclose(file);
+    return 0;
+}
+
+
+void grep(char* filename, char* pattern, flags flags) {
     FILE *file = fopen(filename, "r");
     if (!file) {
         if (!(flags.s))
@@ -109,14 +137,31 @@ void grep(char* filename, char* find, flags flags) {
     node *head = NULL;
     int line_counter = 1;
     char line[LINEMAX];
-
-    if (flags.i) {
-        char* (*str_found)(const char*, const char*) = strstr;
-    }
+    regex_t regex;
+    if (flags.i)
+        regcomp(&regex, pattern, REG_EXTENDED | REG_ICASE);
+    else
+        regcomp(&regex, pattern, REG_EXTENDED);
+    regmatch_t match;
     while(!feof(file)) {
         fgets(line, LINEMAX, file);
-        
-
+        int not_found = regexec(&regex, line, 1, &match, 0);
+        if ((!not_found && !flags.v) || (not_found && flags.v))
+            if (!flags.o || flags.v)
+                head = add(head, line_counter, line);
+            else {
+                while (!not_found) {
+                    char mat[LINEMAX];
+                    int i = 0;
+                    while (i != match.rm_eo - match.rm_so) {
+                        mat[i] = line[match.rm_so + i++];
+                    }
+                    mat[i] = '\0';
+                    head = add(head, line_counter, mat);
+                    not_found = regexec(&regex, line + match.rm_eo, 1, &match, 0);
+                }
+            }
+        line_counter++;
     }
     // out
     if (flags.c || flags.l) {
@@ -143,6 +188,11 @@ void grep(char* filename, char* find, flags flags) {
     head = NULL;
     fclose(file);
 } 
+
+
+
+
+
 /*
 -e Шаблон
 -i Игнорирует различия регистра. //strcasestr
