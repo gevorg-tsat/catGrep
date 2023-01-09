@@ -7,6 +7,8 @@ int main(int argc, char* argv[]) {
     char pattern_file[LINEMAX * _LINE_AMOUNT_MAX_];
     if (parse(argc, argv, &flags, &file_id, pattern, pattern_file))
         return 1;
+    if (argc - file_id == 1)
+        flags.h = 1;
     for (int i = file_id; i < argc; i++) {
         grep(argv[file_id], pattern, flags);
         if (flags.f)
@@ -131,7 +133,6 @@ void grep(char* filename, char* pattern, flags flags) {
     if (!file) {
         if (!(flags.s))
             fprintf(stderr, "grep: %s: No such file or directory", filename);
-        fclose(file);
         return;
     }
     node *head = NULL;
@@ -186,7 +187,7 @@ void grep(char* filename, char* pattern, flags flags) {
             temp = temp -> next;
         }
     }
-    clear_list(head);
+    //clear_list(head);
     head = NULL;
     fclose(file);
 } 
