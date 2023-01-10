@@ -5,14 +5,18 @@ int main(int argc, char* argv[]) {
     int file_id = 0;
     char pattern[LINEMAX];
     char pattern_file[LINEMAX * _LINE_AMOUNT_MAX_];
+    if (argc < 3) {
+        fprintf(stderr, "grep: Not enough params");
+        return 1;
+    }
     if (parse(argc, argv, &flags, &file_id, pattern, pattern_file))
         return 1;
     if (argc - file_id == 1)
         flags.h = 1;
     for (int i = file_id; i < argc; i++) {
-        grep(argv[file_id], pattern, flags);
+        grep(argv[i], pattern, flags);
         if (flags.f)
-            grep(argv[file_id], pattern_file, flags);
+            grep(argv[i], pattern_file, flags);
     }
     return 0;
 }
@@ -36,11 +40,11 @@ node* add(node* head, int line, char data[LINEMAX]) {
 void clear_list(node* head) {
     if (head == NULL)
         return;
-    node* temp = head -> next;
-    while (head != NULL) {
-        free(head);
-        head = temp;
-        temp = temp -> next;
+    node *p = head;
+    while(p != NULL){
+        head = head->next;
+        free(p);
+        p = head;
     }
 }
 int count(node* head) {
@@ -68,6 +72,13 @@ int read_pattern_file(char* filename, char pattern[LINEMAX * _LINE_AMOUNT_MAX_])
     return 0;
 }
 
+void pattern_fix(char str[LINEMAX]) {
+    int i = 0;
+    while (str[i] != '\0') i++;
+    if (i != 0 && str[i-1] == '|')
+        str[i - 1] = str[i];
+}
+
 int parse(int argc, char** argv, flags* flags, int* file_id, char pattern[LINEMAX], char pattern_file[LINEMAX * _LINE_AMOUNT_MAX_]) {
     const char* short_options = "e:ivclnhsf:o";
     const struct option long_options[] = {{NULL, 0, NULL, 0}};
@@ -81,7 +92,7 @@ int parse(int argc, char** argv, flags* flags, int* file_id, char pattern[LINEMA
             case 'e':
                 flags -> e = 1;
                 strcat(pattern, optarg);
-                strcat(pattern_file, "|");
+                strcat(pattern, "|");
                 break;
             case 'i':
                 flags -> i = 1;
@@ -123,6 +134,8 @@ int parse(int argc, char** argv, flags* flags, int* file_id, char pattern[LINEMA
         strcat(pattern, argv[optind]);
         optind++;
     }
+    pattern_fix(pattern);
+    pattern_fix(pattern_file);
     *file_id = optind;
     return 0;
 }
@@ -144,11 +157,11 @@ void grep(char* filename, char* pattern, flags flags) {
     else
         regcomp(&regex, pattern, REG_EXTENDED);
     regmatch_t match;
-    while(!feof(file)) {
+    do {
         fgets(line, LINEMAX, file);
         int not_found = regexec(&regex, line, 1, &match, 0);
         if ((!not_found && !flags.v) || (not_found && flags.v)) {
-            if (!flags.o || flags.v)
+            if (!flags.o || (flags.v))
                 head = add(head, line_counter, line);
             else {
                 while (!not_found) {
@@ -165,7 +178,8 @@ void grep(char* filename, char* pattern, flags flags) {
             }
         }
         line_counter++;
-    }
+    } while(!feof(file) && !ferror(file));
+    
     // out
     if (flags.c || flags.l) {
         if (flags.c) {
@@ -183,16 +197,23 @@ void grep(char* filename, char* pattern, flags flags) {
                 printf("%s:", filename);
             if(flags.n)
                 printf("%d:", temp -> line);
-            printf("%s\n", temp -> data);
+            printf("%s", temp -> data);
+            if (!linefeed_check(temp -> data))
+                printf("\n");
             temp = temp -> next;
         }
     }
-    //clear_list(head);
-    head = NULL;
+    clear_list(head);
     fclose(file);
 } 
 
-
+int linefeed_check(char line[LINEMAX]) {
+    int i = 0;
+    while (line[i] != 0 && i != LINEMAX) i++;
+    if (line[i - 1] == '\n')
+        return 1;
+    return 0;
+}
 
 
 
