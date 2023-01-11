@@ -3,7 +3,7 @@
 #include <getopt.h>
 #include <string.h>
 #include <stdlib.h>
-#define LINEMAX 101
+#define LINEMAX 501
 #define _LINE_AMOUNT_MAX_ 100
 typedef struct node {
     int line;
@@ -32,4 +32,5 @@ int parse(int argc, char** argv, flags* flags, int* file_id, char pattern[LINEMA
 void grep(char* filename, char* pattern, flags flags);
 int read_pattern_file(char* filename, char pattern[LINEMAX * _LINE_AMOUNT_MAX_]);
 int linefeed_check(char line[LINEMAX]);
-void pattern_fix(char str[LINEMAX]);
+void pattern_fix(char str[LINEMAX + LINEMAX * _LINE_AMOUNT_MAX_]);
+void linefeed_ptrn_fix(char str[LINEMAX]);
