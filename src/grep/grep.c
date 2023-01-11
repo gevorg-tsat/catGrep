@@ -158,6 +158,7 @@ void grep(char* filename, char* pattern, flags flags) {
         regcomp(&regex, pattern, REG_EXTENDED);
     regmatch_t match;
     do {
+        line[0] = '\0';
         fgets(line, LINEMAX, file);
         int not_found = regexec(&regex, line, 1, &match, 0);
         if ((!not_found && !flags.v) || (not_found && flags.v)) {
@@ -200,6 +201,7 @@ void grep(char* filename, char* pattern, flags flags) {
             printf("%s", temp -> data);
             if (!linefeed_check(temp -> data))
                 printf("\n");
+            //printf("%lu\n", strlen(temp->data));
             temp = temp -> next;
         }
     }
@@ -209,7 +211,9 @@ void grep(char* filename, char* pattern, flags flags) {
 
 int linefeed_check(char line[LINEMAX]) {
     int i = 0;
-    while (line[i] != 0 && i != LINEMAX) i++;
+    if(line[0] == '\0')
+        return 1;
+    while (line[i] != '\0' && i != LINEMAX) i++;
     if (line[i - 1] == '\n')
         return 1;
     return 0;
